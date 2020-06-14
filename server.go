@@ -37,6 +37,10 @@ Objectives:
 	[ ] 4. GET /movies/genre/drama
 [ ] 6. Send in my results by 10pm Sunday
 
+Notes:
+	- I could speed this up by caching results to disk or redis/memcache
+	- Also, I'd like to play with methods for buffering and returning results,
+		to see if I can find a faster routine.
 */
 
 func getGinEngine() *gin.Engine {

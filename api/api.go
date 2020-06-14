@@ -57,6 +57,7 @@ func getDataFile() string {
 // GetMoviesTconst GET /movies/tconst/:id
 func GetMoviesTconst(c *gin.Context) {
 	id := c.Params.ByName("id")
+	idCasefixed := strings.ToLower(id)
 	tsvFile, err := os.Open(getDataFile())
 	if err != nil {
 		log.Fatalf("Failed opening file: %s", err)
@@ -72,7 +73,7 @@ func GetMoviesTconst(c *gin.Context) {
 
 		fields := strings.Split(oneLine, "\t")
 		oneRecord := arrayToRecord(fields)
-		if oneRecord.Tconst == id {
+		if strings.ToLower(oneRecord.Tconst) == idCasefixed {
 			allRecords = append(allRecords, oneRecord)
 		}
 	}
@@ -111,6 +112,7 @@ func GetMoviesStartYear(c *gin.Context) {
 // GetMoviesGenre GET /movies/genre/:genre
 func GetMoviesGenre(c *gin.Context) {
 	genre := c.Params.ByName("genre")
+	genreCasefixed := strings.ToLower(genre)
 
 	tsvFile, err := os.Open(getDataFile())
 	if err != nil {
@@ -130,7 +132,7 @@ func GetMoviesGenre(c *gin.Context) {
 		oneRecord := arrayToRecord(fields)
 
 		for _, oneGenre := range oneRecord.Genres {
-			if oneGenre == genre {
+			if strings.ToLower(oneGenre) == genreCasefixed {
 				allRecords = append(allRecords, oneRecord)
 			}
 		}
