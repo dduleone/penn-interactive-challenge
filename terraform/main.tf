@@ -6,12 +6,15 @@ provider "aws" {
 
 # We need:
 #   1 x VPC
+#   1 x Subnet
 #   1 x Internet Gateway
 #   1 x SSH Key Pair
 
-#   2 x Security Group
-#   2 x Security Group Egress Rules
-#   3 x Security Group Ingress Rules
+#   1 x Security Group
+#   2 x Security Group Ingress Rules
+#   1 x Security Group Egress Rules
+#   1 x Route Table Route
+#   1 x Route Table Association
 
 #   1 x EC2 Instance
 
@@ -23,7 +26,7 @@ data "aws_route_table" "rttble-primary" {
 }
 
 
-# 1 x VPC should suffice.
+# 1 x VPC
 resource "aws_vpc" "dule1" {
     cidr_block           = var.cidr_vpc
     enable_dns_hostnames = true
@@ -31,6 +34,7 @@ resource "aws_vpc" "dule1" {
     tags = var.alltags
 }
 
+# 1 x Subnet
 resource "aws_subnet" "primary" {
     vpc_id                  = aws_vpc.dule1.id
     cidr_block              = "10.0.0.0/24"
@@ -40,7 +44,6 @@ resource "aws_subnet" "primary" {
     tags = var.alltags
 }
 
-
 # 1 x Internet Gateway so public traffic can get in
 resource "aws_internet_gateway" "ig" {
     vpc_id = aws_vpc.dule1.id
@@ -48,7 +51,7 @@ resource "aws_internet_gateway" "ig" {
     tags = var.alltags
 }
 
-# 1 x SSH Key Pair so we can get to our EC2s
+# 1 x SSH Key Pair so I can get to the EC2
 resource "aws_key_pair" "ssh-key" {
     key_name   = var.ssh_key
     public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCGKaDKSORFMf/QVM9Dx1D700Di+AAxUTGx4YL05MT4mb9TVqXxAt4hrh9Pg5kkX/RMVdXGxDARt3my3P0cPj2WwhmQM+b8X1Lp2kne9qL0flpkrTtqTrhh0qWS+PE90I8HKFVoRLfMqH2L+2T3ARSx3NyWRMCxCXpQnlawujjF3gcGWWugoN6KHEnlDH6yzDv0wUxVgCw5r6LXFbD0gbmmaoHeaDRkWfCcDmcqZR6uJvDagfyGdFwWdcU8OlW2T2hQnH/6fl1PM8ZqSB6fHkTXEaVK3H4cYzY71aGAdvF4S5yXSvYaWfFVZwfEx/ugM2dXd0QRGu1PNaMrR9rwNwSj"
@@ -56,8 +59,7 @@ resource "aws_key_pair" "ssh-key" {
     tags = var.alltags
 }
 
-
-# 2 x Security Groups, one for our EC2s (ssh, http, egress) and one for our Load Balancer (http)
+# 1 x Security Groups for the EC2: ssh, http, egress
 resource "aws_security_group" "sg-ec2" {
     name        = "${var.app_name}-ec2"
     description = "[${var.app_name}] Security Group for EC2 Instances in the ASG"
@@ -69,8 +71,9 @@ resource "aws_security_group" "sg-ec2" {
     
     tags = var.alltags
 }
+    # SSH Ingress
     resource "aws_security_group_rule" "ec2-ingress-ssh" {
-        description       = "Provide SSH ingress access to the EC2s."
+        description       = "Provide SSH ingress access to an EC2."
         type              = "ingress"
         from_port         = 22
         to_port           = 22
@@ -78,8 +81,9 @@ resource "aws_security_group" "sg-ec2" {
         cidr_blocks       = ["0.0.0.0/0"]
         security_group_id = aws_security_group.sg-ec2.id
     }
+    # HTTP Ingress (port 8080)
     resource "aws_security_group_rule" "ec2-ingress-http" {
-        description       = "Provide HTTP ingress access to the EC2s."
+        description       = "Provide HTTP ingress access to an EC2."
         type              = "ingress"
         from_port         = 8080
         to_port           = 8080
@@ -87,8 +91,9 @@ resource "aws_security_group" "sg-ec2" {
         cidr_blocks       = ["0.0.0.0/0"]
         security_group_id = aws_security_group.sg-ec2.id
     }
+    # World Egress
     resource "aws_security_group_rule" "ec2-egress" {
-        description       = "Provide world egress access to the EC2s."
+        description       = "Provide world egress access to an EC2."
         type              = "egress"
         from_port         = 0
         to_port           = 65535
@@ -97,6 +102,21 @@ resource "aws_security_group" "sg-ec2" {
         security_group_id = aws_security_group.sg-ec2.id
     }
 
+
+# 1 x Route Table Route to connect the Internet Gateway
+resource "aws_route" "internet-route" {
+    route_table_id              = data.aws_route_table.rttble-primary.id
+    destination_cidr_block    = "0.0.0.0/0"
+    gateway_id      = aws_internet_gateway.ig.id
+}
+
+# 1 x Route Table Association to associate the Subnet with the Route Table
+resource "aws_route_table_association" "primarysubnet-route-table" {
+    subnet_id     = aws_subnet.primary.id
+    route_table_id = data.aws_route_table.rttble-primary.id
+}
+
+# 1 x EC2 Instance
 resource "aws_instance" "go-server" {
     ami           = var.ec2_ami
     instance_type = var.instance_type
@@ -112,23 +132,14 @@ resource "aws_instance" "go-server" {
     tags = var.alltags
 }
 
-resource "aws_route" "internet-route" {
-    route_table_id              = data.aws_route_table.rttble-primary.id
-    destination_cidr_block    = "0.0.0.0/0"
-    gateway_id      = aws_internet_gateway.ig.id
-}
 
-resource "aws_route_table_association" "primarysubnet-route-table" {
-    subnet_id     = aws_subnet.primary.id
-    route_table_id = data.aws_route_table.rttble-primary.id
-}
-
-
+# Output the URL we can use to test the service, once it's online.
 output "test_url" {
     value = "http://${aws_instance.go-server.public_ip}:8080/"
     description = "Use this URL to test the container, once it's all stood up."
 }
 
+# Output an ssh command I can use to connect to my EC2 instance, for debugging.
 output "ssh_command" {
     value = "ssh -i ~/.ssh/DuLeoneAWSKey.pem ec2-user@${aws_instance.go-server.public_ip}"
     description = "For convenience, this will let me connect to the EC2 instance over ssh."
