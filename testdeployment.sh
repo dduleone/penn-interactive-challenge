@@ -15,4 +15,4 @@ curl http://${1}:8080/movies/startYear/2000 --create-dirs -o responses/movies_st
 curl http://${1}:8080/movies/genre/drama -s > /dev/null
 curl http://${1}:8080/movies/genre/drama -s > /dev/null
 curl http://${1}:8080/movies/genre/drama -s > /dev/null
-curl http://${1}:8080/movies/genre/drama --create-dirs -o responses/movies_genre_draa.json
+curl http://${1}:8080/movies/genre/drama --create-dirs -o responses/movies_genre_drama.json

@@ -16,6 +16,7 @@ Go &amp; Terraform Coding Challenge
 /README.md          This README
 /rundocker.sh       Convenience script for running docker
 /server.go          Main Go Execution
+/testdeployment.sh  Script used to generate execution time analysis
 ```
 
 ## Notes
