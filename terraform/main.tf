@@ -54,7 +54,7 @@ resource "aws_internet_gateway" "ig" {
 # 1 x SSH Key Pair so I can get to the EC2
 resource "aws_key_pair" "ssh-key" {
     key_name   = var.ssh_key
-    public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCGKaDKSORFMf/QVM9Dx1D700Di+AAxUTGx4YL05MT4mb9TVqXxAt4hrh9Pg5kkX/RMVdXGxDARt3my3P0cPj2WwhmQM+b8X1Lp2kne9qL0flpkrTtqTrhh0qWS+PE90I8HKFVoRLfMqH2L+2T3ARSx3NyWRMCxCXpQnlawujjF3gcGWWugoN6KHEnlDH6yzDv0wUxVgCw5r6LXFbD0gbmmaoHeaDRkWfCcDmcqZR6uJvDagfyGdFwWdcU8OlW2T2hQnH/6fl1PM8ZqSB6fHkTXEaVK3H4cYzY71aGAdvF4S5yXSvYaWfFVZwfEx/ugM2dXd0QRGu1PNaMrR9rwNwSj"
+    public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCFlfn2J/RyZWFEFya19HanON9peIDV/SctbrvvOZCKdOt0YStwLsbZqr+DMdXBdJf+7Gjk/wHrRZ3QHNCL8PLMEHt1Hu4zlX82L9YpGNISapoeq+s7L/0Pj/Wb0zOyFPLHn8GU71JRVdzdfFaCJhPwIIZ6JgoPF9z7p3zrlCqncBN1X9SA7yz23o91F+Cs2bAdxVZ/nmtRK1gnVEVtbgHbF8I2iuOjA0tNoFJRjFVQuR9qOxOoCGxUatXno8HFKt2QN4NC+5pLkDfb8ms1ajWitSDzvS0TyyJz/uioozndgiAkWWBOf32HYpjDa4Xe85p0m+qPfZ+IX0W/ZhIv8YYb"
 
     tags = var.alltags
 }
@@ -141,6 +141,6 @@ output "test_url" {
 
 # Output an ssh command I can use to connect to my EC2 instance, for debugging.
 output "ssh_command" {
-    value = "ssh -i ~/.ssh/DuLeoneAWSKey.pem ec2-user@${aws_instance.go-server.public_ip}"
+    value = "ssh -i ./penn_interactive_challenge.pem ec2-user@${aws_instance.go-server.public_ip}"
     description = "For convenience, this will let me connect to the EC2 instance over ssh."
 }
