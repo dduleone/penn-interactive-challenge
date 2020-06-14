@@ -14,9 +14,37 @@ Go &amp; Terraform Coding Challenge
     /vars.tf        Terraform Variable Configuration
 /Dockerfile         Dockerfile for running locally
 /README.md          This README
+/getdata.sh         Script to fetch data
 /rundocker.sh       Convenience script for running docker
 /server.go          Main Go Execution
 /testdeployment.sh  Script used to generate execution time analysis
+```
+
+## How to Use
+
+First, fetch the data:
+
+```bash
+./getdata.sh
+```
+
+To run as Docker container:
+
+```bash
+./rundocker.sh
+```
+
+To run as Go script:
+
+```bash
+go run server.go
+```
+
+To run Terraform:
+
+```bash
+cd terraform
+terraform apply
 ```
 
 ## Notes
