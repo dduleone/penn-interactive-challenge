@@ -99,7 +99,7 @@ resource "aws_security_group" "sg-ec2" {
 
 resource "aws_instance" "go-server" {
     ami           = var.ec2_ami
-    instance_type = "t2.medium"
+    instance_type = var.instance_type
 
     vpc_security_group_ids = [aws_security_group.sg-ec2.id]
     associate_public_ip_address = true

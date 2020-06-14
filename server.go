@@ -29,7 +29,7 @@ Objectives:
 	[X] 5. Format the results
 	[X] 6. Send the response
 [x] 3. Build Docker Container that will run this service
-[ ] 4. Build a Terraform Script to deploy it to AWS
+[x] 4. Build a Terraform Script to deploy it to AWS
 [ ] 5. Capture output from 4 requests:
 	[ ] 1. GET /health
 	[ ] 2. GET /movies/tconst/tt0000492
@@ -46,19 +46,16 @@ Notes:
 func getGinEngine() *gin.Engine {
 	router := gin.Default()
 
-	// const epRoot = "/"
-	const epHealth = "/health"
-	// const epMoviesRoot = "/movies"
-	const epMoviesTconst = "/movies/tconst/:id"
-	const epMoviesStartYear = "/movies/startYear/:year"
-	const epMoviesGenre = "/movies/genre/:genre"
-
-	// router.GET(epRoot, api.GetRoot)
-	router.GET(epHealth, api.GetHealth)
-	// router.GET(epMoviesRoot, api.GetMoviesRoot)
-	router.GET(epMoviesTconst, api.GetMoviesTconst)
-	router.GET(epMoviesStartYear, api.GetMoviesStartYear)
-	router.GET(epMoviesGenre, api.GetMoviesGenre)
+	/*
+		Explicit 404 is unncessary. But APIs where parent routes clarify missing parameters are better for everyone.
+		The assignment did not mention these routes, so I'm leaving them unimplemented and commented out.
+	*/
+	// router.GET("/", func(c *gin.Context) { c.String(http.StatusNotFound, "No such route.") })
+	router.GET("/health", api.GetHealth)
+	// router.GET("/movies", func(c *gin.Context) { c.String(http.StatusNotFound, "No such route.") })
+	router.GET("/movies/tconst/:id", api.GetMoviesTconst)
+	router.GET("/movies/startYear/:year", api.GetMoviesStartYear)
+	router.GET("/movies/genre/:genre", api.GetMoviesGenre)
 
 	fmt.Println("Server is online.")
 	const x = http.StatusOK

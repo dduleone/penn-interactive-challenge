@@ -1,7 +1,3 @@
-variable "domain_name" {
-    default = "dule1.com"
-}
-
 variable "app_name" {
     default = "dule1"
 }
@@ -27,7 +23,7 @@ variable "ec2_ami" {
 }
 
 variable "instance_type" {
-    default = "t2.micro"
+    default = "t2.medium"
 }
 
 variable "cidr_vpc" {
