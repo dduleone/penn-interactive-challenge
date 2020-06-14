@@ -28,3 +28,7 @@ Go &amp; Terraform Coding Challenge
 ### Header Row
 
 The instructions made no mention of the header record in the TSV, so I'm treating it like a normal record.
+
+### Speed
+
+In order to provide better performance, I would recommend caching results, since they shouldn't change from one query to another. Also, I'd like to experiment with the various methods for buffering and sending responses, to look for performance enhancements.
